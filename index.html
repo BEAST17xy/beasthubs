@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEAST HUB — Gaming Community</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #060008;
+  --bg2: #0d0018;
+  --bg3: #130020;
+  --p: #a855f7;
+  --p2: #7c3aed;
+  --p3: #c084fc;
+  --p4: #e9d5ff;
+  --card-bg: rgba(15, 0, 28, 0.85);
+  --border: rgba(168, 85, 247, 0.18);
+  --border2: rgba(168, 85, 247, 0.32);
+  --text: #f3e8ff;
+  --muted: #9d7cbf;
+  --glow: rgba(168, 85, 247, 0.4);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── PARTICLES CANVAS ─── */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── RADIAL GLOW BG ─── */
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 55% 50% at 20% 60%, rgba(124,58,237,0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(168,85,247,0.08) 0%, transparent 60%);
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 22px 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+
+nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(6,0,8,0.7), transparent);
+  pointer-events: none;
+}
+
+.nav-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: #fff;
+  text-decoration: none;
+}
+.nav-logo em { color: var(--p); font-style: normal; }
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.nav-links a.active { color: #fff; }
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0; right: 0;
+  height: 1px;
+  background: var(--p);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+.nav-links a.active::after,
+.nav-links a:hover::after { transform: scaleX(1); }
+.nav-links a:hover { color: #fff; }
+
+.nav-socials {
+  position: fixed;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.nav-social-btn {
+  width: 40px; height: 40px;
+  background: rgba(15,0,28,0.7);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  font-size: 16px;
+  text-decoration: none;
+  color: var(--muted);
+  backdrop-filter: blur(8px);
+}
+.nav-social-btn:hover {
+  border-color: var(--p);
+  background: rgba(168,85,247,0.12);
+  color: var(--p3);
+  transform: translateX(-3px);
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 0;
+  padding: 100px 56px 60px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* LEFT */
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: heroFadeIn 0.9s ease both;
+}
+
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(168,85,247,0.08);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  padding: 7px 16px;
+  border-radius: 100px;
+  width: fit-content;
+  margin-bottom: 32px;
+  letter-spacing: 0.3px;
+}
+
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: livePulse 1.8s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+  50%       { box-shadow: 0 0 0 5px rgba(34,197,94,0); }
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(52px, 7.5vw, 96px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -2px;
+  margin-bottom: 6px;
+  color: #fff;
+}
+
+.hero-title-accent {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(52px, 7.5vw, 96px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -2px;
+  color: var(--p);
+  margin-bottom: 32px;
+  display: block;
+  text-shadow: 0 0 60px rgba(168,85,247,0.5);
+}
+
+.hero-desc {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 440px;
+  line-height: 1.75;
+  margin-bottom: 44px;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--p2);
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 28px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 0 rgba(124,58,237,0);
+}
+.btn-main:hover {
+  background: var(--p);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(124,58,237,0.45);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-outline:hover {
+  border-color: var(--p3);
+  color: var(--p3);
+  background: rgba(168,85,247,0.07);
+  transform: translateY(-2px);
+}
+
+.btn-icon { font-size: 16px; }
+
+/* RIGHT — CARD PANEL */
+.hero-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-left: 48px;
+  animation: cardSlideIn 0.9s 0.2s ease both;
+}
+
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.info-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.info-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168,85,247,0.5), transparent);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 22px;
+}
+
+.panel-icon {
+  width: 44px; height: 44px;
+  background: rgba(168,85,247,0.15);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.panel-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+}
+.panel-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* PANEL ITEMS */
+.panel-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(168,85,247,0.04);
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+}
+.panel-item:last-child { margin-bottom: 0; }
+.panel-item:hover {
+  border-color: var(--p);
+  background: rgba(168,85,247,0.1);
+  transform: translateX(4px);
+}
+
+.pi-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.pi-yt  { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.25); }
+.pi-tt  { background: rgba(0,210,200,0.1);  border: 1px solid rgba(0,210,200,0.2); }
+.pi-tw  { background: rgba(145,70,255,0.15); border: 1px solid rgba(145,70,255,0.3); }
+.pi-dc  { background: rgba(88,101,242,0.15); border: 1px solid rgba(88,101,242,0.3); }
+.pi-pc  { background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); }
+
+.pi-info { flex: 1; min-width: 0; }
+.pi-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pi-desc {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.pi-tags { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+.pi-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+.tag-p  { background: rgba(168,85,247,0.15); color: var(--p3); border: 1px solid rgba(168,85,247,0.25); }
+.tag-g  { background: rgba(52,211,153,0.12); color: #6ee7b7;  border: 1px solid rgba(52,211,153,0.2); }
+.tag-b  { background: rgba(96,165,250,0.12); color: #93c5fd;  border: 1px solid rgba(96,165,250,0.2); }
+.tag-r  { background: rgba(239,68,68,0.12);  color: #fca5a5;  border: 1px solid rgba(239,68,68,0.2); }
+.tag-c  { background: rgba(0,210,200,0.1);   color: #5eead4;  border: 1px solid rgba(0,210,200,0.2); }
+
+.pi-arrow {
+  color: var(--muted);
+  font-size: 16px;
+  transition: color 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+.panel-item:hover .pi-arrow {
+  color: var(--p3);
+  transform: translateX(3px);
+}
+
+/* PANEL FOOTER */
+.panel-footer {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pf-stat { text-align: center; }
+.pf-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--p3);
+}
+.pf-lbl {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+.pf-join {
+  background: rgba(168,85,247,0.15);
+  border: 1px solid var(--border2);
+  color: var(--p3);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.pf-join:hover {
+  background: var(--p2);
+  color: #fff;
+  border-color: var(--p2);
+}
+
+/* ─── LOGO CENTER (hero) ─── */
+.hero-logo-wrap {
+  display: none;
+}
+
+/* ─── BOTTOM STATS BAR ─── */
+.stats-bar {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 28px 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stats-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 80px; right: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168,85,247,0.4), transparent);
+}
+
+.sbar-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sbar-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+.sbar-info { display: flex; flex-direction: column; gap: 1px; }
+.sbar-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.sbar-sub { font-size: 12px; color: var(--muted); }
+.sbar-divider {
+  width: 1px; height: 40px;
+  background: var(--border);
+}
+
+/* ─── SCROLL HINT ─── */
+.scroll-hint {
+  position: absolute;
+  bottom: 32px;
+  left: 80px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 1px;
+  animation: scrollBounce 2s ease-in-out infinite;
+  z-index: 1;
+}
+@keyframes scrollBounce {
+  0%,100% { transform: translateY(0); opacity: 0.6; }
+  50%      { transform: translateY(6px); opacity: 1; }
+}
+.scroll-hint::before {
+  content: '';
+  width: 1px; height: 30px;
+  background: linear-gradient(to bottom, transparent, var(--muted));
+}
+
+/* ─── FOOTER ─── */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 22px 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.foot-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--p);
+}
+.foot-copy { font-size: 12px; color: var(--muted); }
+.foot-links { display: flex; gap: 20px; }
+.foot-links a {
+  font-size: 12px; color: var(--muted);
+  text-decoration: none; transition: color 0.2s;
+}
+.foot-links a:hover { color: var(--p3); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 100px 20px 60px;
+    gap: 40px;
+  }
+  .hero-right {
+    padding-left: 0;
+    justify-content: center;
+  }
+  .nav-socials { display: none; }
+  nav { padding: 16px 20px; }
+  .stats-bar { padding: 24px 20px; flex-direction: column; align-items: flex-start; gap: 16px; }
+  .sbar-divider { display: none; }
+  footer { padding: 20px 20px; }
+  .scroll-hint { display: none; }
+  .stats-bar::before { left: 20px; right: 20px; }
+  .info-panel { max-width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .nav-inner { gap: 20px; }
+  .nav-links { gap: 16px; }
+  .nav-links li:nth-child(3),
+  .nav-links li:nth-child(4) { display: none; }
+
+  .hero-title {
+    font-size: 38px;
+    letter-spacing: -1px;
+  }
+  .hero-title-accent {
+    font-size: 38px;
+    letter-spacing: -1px;
+    margin-bottom: 20px;
+  }
+  .hero-badge { font-size: 12px; margin-bottom: 22px; }
+  .hero-desc { font-size: 14px; margin-bottom: 30px; }
+  .hero-btns { flex-direction: column; gap: 10px; }
+  .btn-main, .btn-outline { width: 100%; justify-content: center; }
+
+  .panel-header { padding-bottom: 16px; margin-bottom: 16px; }
+  .panel-item { padding: 12px; }
+  .pi-name { font-size: 13px; }
+  .pi-desc { font-size: 11px; }
+
+  .panel-footer { flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .pf-join { width: 100%; text-align: center; }
+
+  .sbar-item { width: 100%; }
+  .sbar-num { font-size: 24px; }
+
+  .foot-links { gap: 12px; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="bg-glow"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">BEAST <em>HUB</em></a>
+    <ul class="nav-links">
+      <li><a href="#" class="active">Home</a></li>
+      <li><a href="#setup">Setup</a></li>
+      <li><a href="#canale">Canale</a></li>
+      <li><a href="#discord">Comunitate</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- SIDE SOCIALS -->
+<div class="nav-socials">
+  <a class="nav-social-btn" href="https://www.youtube.com/@BEAST17XY" target="_blank" rel="noopener" title="YouTube">▶</a>
+  <a class="nav-social-btn" href="https://discord.gg/7GcvJmGYNp" target="_blank" rel="noopener" title="Discord">💬</a>
+  <a class="nav-social-btn" href="https://www.tiktok.com/@beast17xy" target="_blank" rel="noopener" title="TikTok">🎵</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+
+  <!-- LEFT -->
+  <div class="hero-left">
+    <div class="hero-badge">
+      <span class="live-dot"></span>
+      Comunitate activă de gaming
+    </div>
+
+    <h1 class="hero-title">Comunitatea</h1>
+    <span class="hero-title-accent">BEAST HUB</span>
+
+    <p class="hero-desc">
+      Setup complet, canale de gaming și o comunitate dedicată. Totul într-un singur loc — bine ai venit în hub.
+    </p>
+
+    <div class="hero-btns">
+      <a href="https://discord.gg/7GcvJmGYNp" target="_blank" rel="noopener" class="btn-main">
+        <span class="btn-icon">⚡</span>
+        Intră pe Discord
+      </a>
+      <a href="#canale" class="btn-outline">
+        <span class="btn-icon">▶</span>
+        Explorează
+      </a>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="hero-right" id="canale">
+    <div class="info-panel">
+
+      <div class="panel-header">
+        <div class="panel-icon">🎮</div>
+        <div>
+          <div class="panel-title">BEAST HUB</div>
+          <div class="panel-subtitle">Canale & Comunitate</div>
+        </div>
+      </div>
+
+      <!-- ITEMS -->
+      <a href="#setup" class="panel-item" id="setup">
+        <div class="pi-icon pi-pc">💻</div>
+        <div class="pi-info">
+          <div class="pi-name">Laptop Setup</div>
+          <div class="pi-desc">HP Victus 15 · RTX 3050 · i5-12450H · 16GB RAM</div>
+          <div class="pi-tags">
+            <span class="pi-tag tag-p">Gaming</span>
+            <span class="pi-tag tag-g">512GB SSD</span>
+          </div>
+        </div>
+        <span class="pi-arrow">›</span>
+      </a>
+
+      <a href="https://www.youtube.com/@BEAST17XY" target="_blank" rel="noopener" class="panel-item">
+        <div class="pi-icon pi-yt">▶</div>
+        <div class="pi-info">
+          <div class="pi-name">BEAST HUB — YouTube</div>
+          <div class="pi-desc">Gameplay, reviews, tier lists. Săptămânal.</div>
+          <div class="pi-tags">
+            <span class="pi-tag tag-r">YouTube</span>
+            <span class="pi-tag tag-g">Activ</span>
+          </div>
+        </div>
+        <span class="pi-arrow">›</span>
+      </a>
+
+      <a href="https://www.tiktok.com/@beast17xy" target="_blank" rel="noopener" class="panel-item">
+        <div class="pi-icon pi-tt">♪</div>
+        <div class="pi-info">
+          <div class="pi-name">@beast17xy — TikTok</div>
+          <div class="pi-desc">Clipuri scurte, momente epice și tips.</div>
+          <div class="pi-tags">
+            <span class="pi-tag tag-c">TikTok</span>
+            <span class="pi-tag tag-b">Daily</span>
+          </div>
+        </div>
+        <span class="pi-arrow">›</span>
+      </a>
+
+      <a href="https://discord.gg/7GcvJmGYNp" target="_blank" rel="noopener" class="panel-item" id="discord">
+        <div class="pi-icon pi-dc">💬</div>
+        <div class="pi-info">
+          <div class="pi-name">Discord Server</div>
+          <div class="pi-desc">Comunitate, LFG, giveaway-uri, voice 24/7.</div>
+          <div class="pi-tags">
+            <span class="pi-tag tag-p">Discord</span>
+            <span class="pi-tag tag-g">Free Join</span>
+          </div>
+        </div>
+        <span class="pi-arrow">›</span>
+      </a>
+
+      <div class="panel-footer">
+        <div class="pf-stat">
+          <div class="pf-num">—</div>
+          <div class="pf-lbl">Membri</div>
+        </div>
+        <div class="pf-stat">
+          <div class="pf-num">—</div>
+          <div class="pf-lbl">Online</div>
+        </div>
+        <div class="pf-stat">
+          <div class="pf-num">24/7</div>
+          <div class="pf-lbl">Activ</div>
+        </div>
+        <a href="https://discord.gg/7GcvJmGYNp" target="_blank" rel="noopener" class="pf-join">Join →</a>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<div class="scroll-hint">scroll</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="sbar-item">
+    <div class="sbar-num">RTX<br>3050</div>
+    <div class="sbar-info">
+      <div class="sbar-label">GPU</div>
+      <div class="sbar-sub">Nvidia GeForce</div>
+    </div>
+  </div>
+  <div class="sbar-divider"></div>
+  <div class="sbar-item">
+    <div class="sbar-num">i5</div>
+    <div class="sbar-info">
+      <div class="sbar-label">CPU</div>
+      <div class="sbar-sub">Intel Core i5-12450H</div>
+    </div>
+  </div>
+  <div class="sbar-divider"></div>
+  <div class="sbar-item">
+    <div class="sbar-num">16</div>
+    <div class="sbar-info">
+      <div class="sbar-label">RAM GB</div>
+      <div class="sbar-sub">DDR4</div>
+    </div>
+  </div>
+  <div class="sbar-divider"></div>
+  <div class="sbar-item">
+    <div class="sbar-num">512</div>
+    <div class="sbar-info">
+      <div class="sbar-label">SSD GB</div>
+      <div class="sbar-sub">HP Victus 15.6"</div>
+    </div>
+  </div>
+  <div class="sbar-divider"></div>
+  <div class="sbar-item">
+    <div class="sbar-num">3</div>
+    <div class="sbar-info">
+      <div class="sbar-label">Canale</div>
+      <div class="sbar-sub">YT · TikTok · Discord</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="foot-logo">BEAST HUB</div>
+    <div class="foot-copy">© 2026 Beast Hub — Toate drepturile rezervate</div>
+  </div>
+  <div class="foot-links">
+    <a href="https://discord.gg/7GcvJmGYNp" target="_blank" rel="noopener">Discord</a>
+    <a href="https://www.youtube.com/@BEAST17XY" target="_blank" rel="noopener">YouTube</a>
+    <a href="https://www.tiktok.com/@beast17xy" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://discord.gg/7GcvJmGYNp" target="_blank" rel="noopener">Contact</a>
+  </div>
+</footer>
+
+<!-- PARTICLES -->
+<script>
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function initParticles() {
+    particles = [];
+    const count = Math.floor((W * H) / 14000);
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.4 + 0.3,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: (Math.random() - 0.5) * 0.12,
+        alpha: Math.random() * 0.5 + 0.1,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.008 + 0.004,
+        color: Math.random() > 0.7 ? '#a855f7' : '#c084fc'
+      });
+    }
+  }
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    t += 0.016;
+    for (const p of particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = W;
+      if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H;
+      if (p.y > H) p.y = 0;
+      const a = p.alpha * (0.5 + 0.5 * Math.sin(t * p.speed * 60 + p.phase));
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color === '#a855f7' ? `rgba(168,85,247,${a})` : `rgba(192,132,252,${a})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  initParticles();
+  draw();
+  window.addEventListener('resize', () => { resize(); initParticles(); });
+
+  document.querySelectorAll('.panel-item').forEach(item => {
+    item.addEventListener('mouseenter', function() {
+      this.style.transition = 'border-color 0.15s, background 0.15s, transform 0.15s';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
